@@ -1,0 +1,23 @@
+apiVersion: source.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: n8n-cluster-config
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: https://github.com/davincent/n8n-raspberrypi-cluster
+---
+apiVersion: kustomize.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: n8n-apps
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: ./k8s-manifests/apps
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: n8n-cluster-config

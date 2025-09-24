@@ -1,0 +1,48 @@
+apiVersion: image.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: n8n
+  namespace: flux-system
+spec:
+  image: n8nio/n8n
+  interval: 5m0s
+---
+apiVersion: image.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: n8n
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: n8n
+  policy:
+    semver:
+      range: '>=1.0.0'
+---
+apiVersion: image.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: n8n-automation
+  namespace: flux-system
+spec:
+  interval: 10m
+  sourceRef:
+    kind: GitRepository
+    name: n8n-cluster-config
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: flux-bot@davincent.dev
+        name: "Flux Image Automation"
+      messageTemplate: |
+        🤖 Automated n8n image update
+        
+        Updated n8n to {{ .Updated.Images | first | .Current.Tag }}
+    push:
+      branch: main
+  update:
+    path: "./k8s-manifests/apps"
+    strategy: Setters
