@@ -1,0 +1,26 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: n8n-automation
+  namespace: flux-system
+spec:
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: flux-bot@davincent.dev
+        name: Flux Image Automation
+      messageTemplate: "\U0001F916 Automated n8n image update to {{.Updated.Images
+        | first | .Current.Tag}}"
+    push:
+      branch: main
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: n8n-cluster-config
+  update:
+    path: ./k8s-manifests/apps
+    strategy: Setters
